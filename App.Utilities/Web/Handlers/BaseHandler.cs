@@ -7,6 +7,7 @@ using System.Web.Script.Serialization;
 using System.Reflection;
 using System.Web.SessionState;
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace App.Utilities.Web.Handlers
 {
@@ -97,9 +98,7 @@ namespace App.Utilities.Web.Handlers
 				switch (context.Response.ContentType.ToLower())
 				{
 					case "application/json":
-						JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
-						string json = jsonSerializer.Serialize(result);
-						context.Response.Write(json);
+                        context.Response.Write(JsonConvert.SerializeObject(result));
 						break;
 					case "application/xml":
 						System.Xml.Serialization.XmlSerializer xmlSerializer = new System.Xml.Serialization.XmlSerializer(result.GetType());
