@@ -73,10 +73,15 @@ namespace App.Utilities.Web.Handlers
                         {
 							Dictionary<string, Object> dict = (Dictionary<string, Object>)json;
 
-							if (dict.ContainsKey("method"))
-								method = dict["method"].ToString();
-							else
-								throw new Exception("Invalid BaseHandler call. MethodName parameter is mandatory in json object.");
+                            if (dict.ContainsKey("method"))
+                                method = dict["method"].ToString();
+                            else
+                            {
+                                //throw new Exception("Invalid BaseHandler call. MethodName parameter is mandatory in json object.");
+                                context.Response.StatusDescription = "Invalid BaseHandler call. MethodName parameter is mandatory in json object.";
+                                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                                return;
+                            }                                
 
 							if (dict.ContainsKey("returntype"))
 								returnType = dict["returntype"].ToString();
@@ -88,7 +93,9 @@ namespace App.Utilities.Web.Handlers
 						}
 						catch
 						{
-							throw new InvalidCastException("Unable to cast json object to AjaxCallSignature");
+							//throw new InvalidCastException("Unable to cast json object to AjaxCallSignature");
+                            context.Response.StatusDescription = "Unable to cast json object to AjaxCallSignature";
+                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 						}
 					}
 				}
@@ -107,7 +114,9 @@ namespace App.Utilities.Web.Handlers
 						}
 						else
 						{
-							throw new Exception("Method name was already specified on the json data. Specify the method name only once, either on QueryString params or on the json data.");
+							//throw new Exception("Method name was already specified on the json data. Specify the method name only once, either on QueryString params or on the json data.");
+                            context.Response.StatusDescription = "Method name was already specified on the json data. Specify the method name only once, either on QueryString params or on the json data.";
+                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 						}
 					}
 					else if (key.ToLower() == "returntype")
@@ -151,12 +160,14 @@ namespace App.Utilities.Web.Handlers
 #if DEBUG
 					m = handler.GetType().BaseType.GetMethod("Help");
 #else
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return null;
 #endif
 				}
 				else
 				{
                     //throw new Exception(string.Format("Method {0} not found on Handler {1}.", method, this.GetType().ToString()));
+                    context.Response.StatusDescription = string.Format("Method {0} not found on Handler {1}.", method, this.GetType().ToString());
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     return null;
 				}
@@ -201,6 +212,7 @@ namespace App.Utilities.Web.Handlers
 					if (!context.Request.IsAuthenticated && ((RequireAuthenticationAttribute)attrs[0]).RequireAuthentication)
 					{
 						//throw new InvalidOperationException("Method [" + m.Name + "] Requires authentication");
+                        context.Response.StatusDescription = "Method [" + m.Name + "] Requires authentication";
                         context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                         return null;
 					}
