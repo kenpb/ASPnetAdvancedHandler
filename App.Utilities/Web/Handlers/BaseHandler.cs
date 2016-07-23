@@ -21,10 +21,11 @@ namespace App.Utilities.Web.Handlers
 			private set { _context = value; }
 		}
 
-		public virtual object GET() { return "Default GET Response"; }
-		public virtual object POST() { return "Default POST Response"; }
-		public virtual object PUT() { return "Default PUT Response"; }
-		public virtual object DELETE() { return "Default DELETE Response"; }
+        // Since we want to use the default methods with different params override is not an option
+        // public virtual object GET() { return "Default GET Response"; }
+		// public virtual object POST() { return "Default POST Response"; }
+		// public virtual object PUT() { return "Default PUT Response"; }
+		// public virtual object DELETE() { return "Default DELETE Response"; }
 
 		/// <summary>
 		/// Intercept the execution right before the handler method is called

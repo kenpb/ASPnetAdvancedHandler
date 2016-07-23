@@ -9,13 +9,13 @@ namespace CodeProject.GenericHandler
 	public class HttpVerbsHandler : BaseHandler
 	{
 
-		public override object GET()
+		public object GET()
 		{
-			//SetResponseContentType(ResponseContentTypes.JSON);
+			SetResponseContentType(ResponseContentTypes.JSON);
 			return new MyObject() { Name = "GET -> AlexCode", Age = 35 };
 		}
 
-		public override object PUT()
+		public object PUT()
 		{
 			SetResponseContentType(ResponseContentTypes.JSON);
 			return new { Name = "Alex", Age = 35 };
