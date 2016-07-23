@@ -8,6 +8,7 @@ using System.Web.Script.Serialization;
 using System.IO;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace App.Utilities.Web.Handlers
 {
@@ -56,12 +57,20 @@ namespace App.Utilities.Web.Handlers
 					}
 					else
 					{
-						object json = null;
-						JavaScriptSerializer serializer = new JavaScriptSerializer();
-						json = serializer.DeserializeObject(context.Request.QueryString[null]);
+                        object json = null;
 
-						try
-						{
+                        try
+                        {
+                            JavaScriptSerializer serializer = new JavaScriptSerializer();
+                            json = serializer.DeserializeObject(context.Request.QueryString[null]);
+                        }
+                        catch (Exception)
+                        {
+                            return;
+                        }
+                        
+                        try
+                        {
 							Dictionary<string, Object> dict = (Dictionary<string, Object>)json;
 
 							if (dict.ContainsKey("method"))
@@ -139,11 +148,17 @@ namespace App.Utilities.Web.Handlers
 			{
 				if (method.ToLower() == "help")
 				{
+#if DEBUG
 					m = handler.GetType().BaseType.GetMethod("Help");
+#else
+                    return null;
+#endif
 				}
 				else
 				{
-					throw new Exception(string.Format("Method {0} not found on Handler {1}.", method, this.GetType().ToString()));
+                    //throw new Exception(string.Format("Method {0} not found on Handler {1}.", method, this.GetType().ToString()));
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return null;
 				}
 			}
 			else
@@ -171,7 +186,9 @@ namespace App.Utilities.Web.Handlers
 
 				if (!VerbAllowedOnMethod || !VerbAllowedOnHandler)
 				{
-					throw new HttpVerbNotAllowedException();
+					//throw new HttpVerbNotAllowedException();
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return null;
 				}
 
 				// security validation: Search for RequireAuthenticationAttribute on the method
@@ -183,7 +200,9 @@ namespace App.Utilities.Web.Handlers
 
 					if (!context.Request.IsAuthenticated && ((RequireAuthenticationAttribute)attrs[0]).RequireAuthentication)
 					{
-						throw new InvalidOperationException("Method [" + m.Name + "] Requires authentication");
+						//throw new InvalidOperationException("Method [" + m.Name + "] Requires authentication");
+                        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                        return null;
 					}
 				}
 			}
