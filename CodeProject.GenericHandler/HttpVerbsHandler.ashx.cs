@@ -8,11 +8,10 @@ namespace CodeProject.GenericHandler
 {
 	public class HttpVerbsHandler : BaseHandler
 	{
-
-		public object GET()
+		public object GET(string test = null)
 		{
 			SetResponseContentType(ResponseContentTypes.JSON);
-			return new MyObject() { Name = "GET -> AlexCode", Age = 35 };
+			return new MyObject() { Name = "GET -> AlexCode", Age = 35, Test = test };
 		}
 
 		public object PUT()
@@ -31,6 +30,7 @@ namespace CodeProject.GenericHandler
 		{
 			public string Name { get; set; }
 			public Int32 Age { get; set; }
+            public string Test { get; set; }
 		}
 
 	}
